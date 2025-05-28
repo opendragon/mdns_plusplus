@@ -28,9 +28,11 @@
  #include <Winsock2.h>
  #include <Ws2tcpip.h>
  #if defined(_MSC_BUILD)
-  #define strncasecmp _strnicmp
+  #define strncasecmp   _strnicmp
  #else /* not defined(_MSC_BUILD) */
-  #define strncasecmp strnicmp
+  #if (! defined(strncasecmp))
+   #define strncasecmp  strnicmp
+  #endif /* not defined(strncasecmp) */
  #endif /* not defined(_MSC_BUILD) */
 #else /* not defined(_WIN32) */
  #include <unistd.h>
