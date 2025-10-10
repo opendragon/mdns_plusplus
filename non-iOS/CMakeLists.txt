@@ -84,14 +84,18 @@ else()
     set(UNKNOWN_CPU OFF)
 endif()
 
+if(WIN32)
+    set(CMAKE_INSTALL_PREFIX "C:/Program Files/mdns_plusplus" CACHE STRING "Fixes install path for mdns_plusplus" FORCE)
+else()
+    set(CMAKE_INSTALL_PREFIX "/opt/mdns_plusplus" CACHE STRING "Fixes install path for mdns_plusplus" FORCE)
+endif()
+
 if(APPLE)
     set(CMAKE_CXX_FLAGS "-Wall -Wextra" CACHE STRING "Fixes linking error for mdns_plusplus" FORCE)
-    set(CMAKE_INSTALL_PREFIX "/opt/mdns_plusplus" CACHE STRING "Fixes install path for mdns_plusplus" FORCE)
 # 'rpath' warning
 #    cmake_policy(SET CMP0042 OLD)
 elseif(LINUX)
     set(CMAKE_CXX_FLAGS "-Wall -Wextra" CACHE STRING "Fixes linking error for mdns_plusplus" FORCE)
-    set(CMAKE_INSTALL_PREFIX "/opt/mdns_plusplus" CACHE STRING "Fixes install path for mdns_plusplus" FORCE)
 endif()
 
 set(CMAKE_USE_RELATIVE_PATHS ON CACHE BOOL "Always set file paths as relative")
