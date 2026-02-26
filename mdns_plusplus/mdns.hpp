@@ -501,8 +501,11 @@ make_mdns_string
 {
 	mDNS::string_t result;
 
-	result.str = strdup(inString);
-	result.length = inLength;
+    if ((nullptr != inString) && (0 < inLength))
+    {
+        result.str = strdup(inString);
+        result.length = inLength;
+    }
 	return result;
 }
 
@@ -512,8 +515,11 @@ make_mdns_string
 {
 	mDNS::string_t result;
 
-	result.str = strdup(inString);
-	result.length = strlen(inString);
+    if (nullptr != inString)
+    {
+        result.str = strdup(inString);
+        result.length = strlen(inString);
+    }
 	return result;
 }
 
