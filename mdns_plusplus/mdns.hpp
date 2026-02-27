@@ -137,6 +137,14 @@ namespace mDNS
 	{
 		const char * str;
 		size_t       length;
+
+        void init
+            (void)
+        {
+            str = nullptr;
+            length = 0;
+        }
+
     };
 
 	struct string_pair_t
@@ -508,8 +516,7 @@ make_mdns_string
     }
     else
     {
-        result.str = nullptr;
-        result.length = 0;
+        result.init();
     }
 	return result;
 }
@@ -522,8 +529,7 @@ make_mdns_string
 
     if (nullptr == inString)
     {
-        result.str = nullptr;
-        result.length = 0;
+        result.init();
     }
     else
     {
@@ -559,8 +565,7 @@ release_mdns_string
 	(mDNS::string_t & inString)
 {
 	delete inString.str;
-	inString.str = nullptr;
-	inString.length = 0;
+    inString.init();
 }
 
 // Implementations
