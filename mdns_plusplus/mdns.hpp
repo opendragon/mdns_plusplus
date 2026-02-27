@@ -138,7 +138,7 @@ namespace mDNS
 		const char * str;
 		size_t       length;
 
-        void init
+        inline void init
             (void)
         {
             str = nullptr;
@@ -204,6 +204,15 @@ namespace mDNS
 		} data;
 		rclass_t_ rclass;
 		ttl_t_    ttl;
+
+        inline void init
+            (void)
+        {
+            name.init();
+            type = kRecordTypeIgnore;
+            memset(&data, 0, sizeof(data));
+            rclass = ttl = 0;
+        }
 	};
 
 	struct header_t
