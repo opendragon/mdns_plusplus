@@ -60,9 +60,9 @@ namespace mDNS
 	// Suppresses 'unused variable' warnings.
 	namespace internal_
 	{
-		template <typename Type>
+		template <typename Type_>
 		void ignore_unused_variable_
-			(const Type &)
+			(const Type_ &)
 		{
 		} /* ignore_unused_variable_ */
 	}; /* internal_ */
@@ -137,7 +137,7 @@ namespace mDNS
 	{
 		const char * str;
 		size_t       length;
-	};
+    };
 
 	struct string_pair_t
 	{
@@ -310,7 +310,7 @@ namespace mDNS
 		 const size_t       capacity,
 		 record_callback_fn callback,
 		 void *             user_data,
-		 const int          query_id);
+		 const int          only_query_id);
 
 	//! Send a variable unicast mDNS query answer to any question with variable number of records to the
 	//! given address. Use the top bit of the query class field (MDNS_UNICAST_RESPONSE) in the query
@@ -329,9 +329,9 @@ namespace mDNS
 		 const char *        name,
 		 const size_t        name_length,
 		 const record_t &    answer,
-		 record_t *          authority,
+		 const record_t *    authority,
 		 const size_t        authority_count,
-		 record_t *          additional,
+		 const record_t *    additional,
 		 const size_t        additional_count);
 
 	//! Send a variable multicast mDNS query answer to any question with variable number of records. Use
@@ -344,9 +344,9 @@ namespace mDNS
 		 void *           buffer,
 		 const size_t     capacity,
 		 const record_t & answer,
-		 record_t *       authority,
+		 const record_t * authority,
 		 const size_t     authority_count,
-		 record_t *       additional,
+		 const record_t * additional,
 		 const size_t     additional_count);
 
 	//! Send a variable multicast mDNS announcement (as an unsolicited answer) with variable number of
@@ -358,9 +358,9 @@ namespace mDNS
 		 void *           buffer,
 		 const size_t     capacity,
 		 const record_t & answer,
-		 record_t *       authority,
+		 const record_t * authority,
 		 const size_t     authority_count,
-		 record_t *       additional,
+		 const record_t * additional,
 		 const size_t     additional_count);
 
 	//! Send a variable multicast mDNS announcement. Use this on service end for removing the resource
@@ -371,9 +371,9 @@ namespace mDNS
 		 void *           buffer,
 		 const size_t     capacity,
 		 const record_t & answer,
-		 record_t *       authority,
+		 const record_t * authority,
 		 const size_t     authority_count,
-		 record_t *       additional,
+		 const record_t * additional,
 		 const size_t     additional_count);
 
 	// Parse records functions
@@ -464,7 +464,7 @@ namespace mDNS
 
 		static void *
 		string_make
-			(void * buffer,
+			(const void *     buffer,
 			 const size_t     capacity,
 			 void *           data,
 			 const char *     name,
@@ -473,7 +473,7 @@ namespace mDNS
 
 		static void *
 		string_make
-			(void *       buffer,
+			(const void * buffer,
 			 const size_t capacity,
 			 void *       data,
 			 const char * name,
@@ -506,6 +506,11 @@ make_mdns_string
         result.str = strdup(inString);
         result.length = inLength;
     }
+    else
+    {
+        result.str = nullptr;
+        result.length = 0;
+    }
 	return result;
 }
 
@@ -515,7 +520,12 @@ make_mdns_string
 {
 	mDNS::string_t result;
 
-    if (nullptr != inString)
+    if (nullptr == inString)
+    {
+        result.str = nullptr;
+        result.length = 0;
+    }
+    else
     {
         result.str = strdup(inString);
         result.length = strlen(inString);
@@ -970,12 +980,13 @@ mDNSP::string_equal
 	size_t              lhs_end = MDNS_INVALID_POS;
 	size_t              rhs_end = MDNS_INVALID_POS;
 	mDNS::string_pair_t lhs_substr;
-	mDNS::string_pair_t rhs_substr;
 	unsigned int        counter = 0;
 
 	do
 	{
-		lhs_substr = mdns_get_next_substring(buffer_lhs, size_lhs, lhs_cur);
+        mDNS::string_pair_t rhs_substr;
+
+        lhs_substr = mdns_get_next_substring(buffer_lhs, size_lhs, lhs_cur);
 		rhs_substr = mdns_get_next_substring(buffer_rhs, size_rhs, rhs_cur);
 		if ((MDNS_INVALID_POS == lhs_substr.offset) || (MDNS_INVALID_POS == rhs_substr.offset) ||
 			(MDNS_MAX_SUBSTRINGS < counter++))
@@ -1191,7 +1202,7 @@ mdns_string_make_ref
 
 static void *
 mDNSP::string_make
-	(void *                 buffer,
+	(const void *           buffer,
 	 const size_t           capacity,
 	 void *                 data,
 	 const char *           name,
@@ -1243,7 +1254,7 @@ mDNSP::string_make
 
 static void *
 mDNSP::string_make
-	(void *       buffer,
+	(const void * buffer,
 	 const size_t capacity,
 	 void *       data,
 	 const char * name,
@@ -1881,7 +1892,7 @@ mDNS::query_recv
 
 static void *
 mdns_answer_add_question_unicast
-	(void *                    buffer,
+	(const void *              buffer,
 	 const size_t              capacity,
 	 void *                    data,
 	 const mDNS::record_type_t record_type,
@@ -1911,10 +1922,10 @@ mdns_answer_add_question_unicast
 
 static void *
 mdns_answer_add_record_header
-	(void *                 buffer,
+	(const void *           buffer,
 	 const size_t           capacity,
 	 void *                 data,
-	 const mDNS::record_t   record,
+	 const mDNS::record_t & record,
 	 mDNS::string_table_t & string_table)
 {
 	data = mDNSP::string_make(buffer, capacity, data, record.name.str, record.name.length, string_table);
@@ -1942,7 +1953,7 @@ mdns_answer_add_record_header
 
 static void *
 mdns_answer_add_record
-	(void *                 buffer,
+	(const void *           buffer,
 	 const size_t           capacity,
 	 void *                 data,
 	 const mDNS::record_t & record,
@@ -1961,9 +1972,9 @@ mdns_answer_add_record
 
 	}
 	// Pointer to length of record to be filled at end
-	void * record_length = MDNS_POINTER_OFFSET(data, - static_cast<int>(sizeof(mDNS::leng_t_)));
-	void * record_data = data;
-	size_t remain = capacity - MDNS_POINTER_DIFF(data, buffer);
+	void *       record_length = MDNS_POINTER_OFFSET(data, - static_cast<int>(sizeof(mDNS::leng_t_)));
+	const void * record_data = data;
+	size_t       remain = capacity - MDNS_POINTER_DIFF(data, buffer);
 
 	switch (record.type)
 	{
@@ -2051,19 +2062,19 @@ mdns_record_update_rclass_ttl
 
 static void *
 mdns_answer_add_txt_record
-	(void *                 buffer,
+	(const void *           buffer,
 	 const size_t           capacity,
 	 void *                 data,
-	 mDNS::record_t *       records,
+	 const mDNS::record_t * records,
 	 const size_t           record_count,
 	 const mDNS::rclass_t_  rclass,
 	 const mDNS::ttl_t_     ttl,
 	 mDNS::string_table_t & string_table)
 {
 	// Pointer to length of record to be filled at end
-	void * record_length = nullptr;
-	void * record_data = nullptr;
-	size_t remain;
+	void *       record_length = nullptr;
+	const void * record_data = nullptr;
+	size_t       remain;
 
 	for (size_t irec = 0; (nullptr != data) && (irec < record_count); ++irec)
 	{
@@ -2124,8 +2135,8 @@ mdns_answer_add_txt_record
 
 static mDNS::count_t_
 mdns_answer_get_record_count
-	(mDNS::record_t * records,
-	 const size_t     record_count)
+	(const mDNS::record_t * records,
+	 const size_t           record_count)
 {
 	// TXT records will be coalesced into one record
 	mDNS::count_t_ total_count = 0;
@@ -2157,9 +2168,9 @@ mDNS::query_answer_unicast
 	 const char *        name,
 	 const size_t        name_length,
 	 const record_t &    answer,
-	 record_t *          authority,
+	 const record_t *    authority,
 	 const size_t        authority_count,
-	 record_t *          additional,
+	 const record_t *    additional,
 	 const size_t        additional_count)
 {
 	if (capacity < (sizeof(header_t) + 32 + 4))
@@ -2233,9 +2244,9 @@ mdns_answer_multicast_rclass_ttl
 	 const size_t           capacity,
 	 const mDNS::rclass_t_  rclass,
 	 const mDNS::record_t & answer,
-	 mDNS::record_t *       authority,
+	 const mDNS::record_t * authority,
 	 const size_t           authority_count,
-	 mDNS::record_t *       additional,
+	 const mDNS::record_t * additional,
 	 const size_t           additional_count,
 	 const mDNS::ttl_t_     ttl)
 {
@@ -2297,9 +2308,9 @@ mdns_answer_multicast_rclass
 	 const size_t           capacity,
 	 const mDNS::rclass_t_  rclass,
 	 const mDNS::record_t & answer,
-	 mDNS::record_t *       authority,
+	 const mDNS::record_t * authority,
 	 const size_t           authority_count,
-	 mDNS::record_t *       additional,
+	 const mDNS::record_t * additional,
 	 const size_t           additional_count)
 {
 	return mdns_answer_multicast_rclass_ttl(sock, buffer, capacity, rclass, answer, authority, authority_count, additional,
@@ -2312,9 +2323,9 @@ mDNS::query_answer_multicast
 	 void *           buffer,
 	 const size_t     capacity,
 	 const record_t & answer,
-	 record_t *       authority,
+	 const record_t * authority,
 	 const size_t     authority_count,
-	 record_t *       additional,
+	 const record_t * additional,
 	 const size_t     additional_count)
 {
 	mDNS::rclass_t_ rclass = mDNS::kClassTypeIn;
@@ -2328,9 +2339,9 @@ mDNS::announce_multicast
 	 void *           buffer,
 	 const size_t     capacity,
 	 const record_t & answer,
-	 record_t *       authority,
+	 const record_t * authority,
 	 const size_t     authority_count,
-	 record_t *       additional,
+	 const record_t * additional,
 	 const size_t     additional_count)
 {
 	mDNS::rclass_t_ rclass = (mDNS::kClassTypeIn | MDNS_CACHE_FLUSH);
@@ -2344,9 +2355,9 @@ mDNS::goodbye_multicast
 	 void *           buffer,
 	 const size_t     capacity,
 	 const record_t & answer,
-	 record_t *       authority,
+	 const record_t * authority,
 	 const size_t     authority_count,
-	 record_t *       additional,
+	 const record_t * additional,
 	 const size_t     additional_count)
 {
 	mDNS::rclass_t_ rclass = (mDNS::kClassTypeIn | MDNS_CACHE_FLUSH);
@@ -2390,7 +2401,6 @@ mDNS::record_parse_srv
 #if defined(mdns_plusplus_LogActivity)
     std::cerr << "mDNS::record_parse_srv enter\n";
 #endif /* defined(mdns_plusplus_LogActivity) */
-	size_t       work_offset = offset;
 	record_srv_t srv;
 
 	memset(&srv, 0, sizeof(srv));
@@ -2408,7 +2418,8 @@ mDNS::record_parse_srv
 		srv.priority = mdns_ntohs(recorddata++);
 		srv.weight = mdns_ntohs(recorddata++);
 		srv.port = mdns_ntohs(recorddata++);
-		work_offset += (sizeof(srv.priority) + sizeof(srv.weight) + sizeof(srv.port));
+		size_t  work_offset = offset + (sizeof(srv.priority) + sizeof(srv.weight) + sizeof(srv.port));
+
 		srv.name = mDNSP::string_extract(buffer, size, work_offset, strbuffer, capacity);
 	}
 	return srv;
@@ -2470,10 +2481,9 @@ mDNS::record_parse_txt
 #if defined(mdns_plusplus_LogActivity)
     std::cerr << "mDNS::record_parse_txt enter\n";
 #endif /* defined(mdns_plusplus_LogActivity) */
-	size_t       work_offset = offset;
-	size_t       parsed = 0;
-	const char * strdata;
-	size_t       end = work_offset + length;
+	size_t  work_offset = offset;
+	size_t  parsed = 0;
+	size_t  end = work_offset + length;
 
 	if (size < end)
 	{
@@ -2481,10 +2491,9 @@ mDNS::record_parse_txt
 	}
 	while ((work_offset < end) && (parsed < capacity))
 	{
-		strdata = reinterpret_cast<const char *>(MDNS_POINTER_OFFSET_CONST(buffer, work_offset));
-		size_t sublength = *reinterpret_cast<const unsigned char *>(strdata);
+        const char * strdata = reinterpret_cast<const char *>(MDNS_POINTER_OFFSET_CONST(buffer, work_offset)) + 1;
+		size_t       sublength = *reinterpret_cast<const unsigned char *>(strdata);
 
-		++strdata;
 		work_offset += sublength + 1;
 		size_t separator = 0;
 
