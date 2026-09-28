@@ -53,7 +53,8 @@ if(APPLE)
 endif()
 
 project(${PROJECT_NAME}
-        HOMEPAGE_URL "https://github.com/opendragon/mdns_plusplus")
+        HOMEPAGE_URL "https://github.com/opendragon/mdns_plusplus"
+        LANGUAGES CXX)
 
 include(../mdns_plusplusCommonSettings.cmake NO_POLICY_SCOPE)
 
