@@ -43,7 +43,7 @@ set(PROJECT_NAME "mdns_plusplus")
 if(APPLE)
     project(${PROJECT_NAME}
             HOMEPAGE_URL "https://github.com/opendragon/mdns_plusplus"
-            LANGUAGES CXX)
+            LANGUAGES C CXX)
 else()
     project(${PROJECT_NAME}
             HOMEPAGE_URL "https://github.com/opendragon/mdns_plugplus"
