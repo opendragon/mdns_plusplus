@@ -41,6 +41,16 @@ cmake_minimum_required(VERSION 3.12 FATAL_ERROR)
 set(PROJECT_NAME "mdns_plusplus")
 
 if(APPLE)
+    project(${PROJECT_NAME}
+            HOMEPAGE_URL "https://github.com/opendragon/mdns_plusplus"
+            LANGUAGES CXX OBJC)
+else()
+    project(${PROJECT_NAME}
+            HOMEPAGE_URL "https://github.com/opendragon/mdns_plugplus"
+            LANGUAGES CXX)
+endif()
+
+if(APPLE)
     execute_process(COMMAND uname -m
                     OUTPUT_VARIABLE CPU_TYPE
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -51,10 +61,6 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES ${CPU_TYPE} CACHE STRING "Build architectures for Mac OSX")
     set(CMAKE_OSX_DEPLOYMENT_TARGET ${SYS_VERSION} CACHE STRING "Deployment target for Mac OSX")
 endif()
-
-project(${PROJECT_NAME}
-        HOMEPAGE_URL "https://github.com/opendragon/mdns_plusplus"
-        LANGUAGES CXX OBJC)
 
 include(../mdns_plusplusCommonSettings.cmake NO_POLICY_SCOPE)
 
